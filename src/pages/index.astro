@@ -1,7 +1,7 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import Card from "../components/Card.astro";
+import List from "../components/List";
 import { getCategories } from "../db";
+import Layout from "../layouts/Layout.astro";
 const categories = getCategories();
 ---
 
@@ -12,15 +12,10 @@ const categories = getCategories();
       خزانة هي مجموعة من الكتب التي يمكنك قراءتها مجانًا عبر الإنترنت. يمكنك
       أيضًا تحميل الكتب بتنسيق PDF.
     </p>
-    <ul role="list" class="link-card-grid">
-      {
-        categories.map((c) => (
-          <Card href={`/category/${c.category_id}/`} title={c.category_name} />
-        ))
-      }
-    </ul>
+    <List client:load data={categories} />
   </main>
 </Layout>
+
 <style>
   main {
     margin: auto;
@@ -75,11 +70,5 @@ const categories = getCategories();
   }
   .instructions strong {
     color: rgb(var(--accent-dark));
-  }
-  .link-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(21ch, 1fr));
-    gap: 2rem;
-    padding: 0;
   }
 </style>

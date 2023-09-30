@@ -1,6 +1,7 @@
 ---
-import Card from "../../components/Card.astro";
+import Card from "../../components/Card.tsx";
 import { getCategories, getCategoryBooks } from "../../db";
+import type { Book } from "../../db/types";
 import Layout from "../../layouts/Layout.astro";
 export async function getStaticPaths() {
   const categories = getCategories()
@@ -13,7 +14,9 @@ export async function getStaticPaths() {
 }
 const { id } = Astro.params;
 const { name } = Astro.props;
-const books = getCategoryBooks(Number(id)).filter((b) => !!b.pdf_links);
+const books = getCategoryBooks(Number(id)).filter(
+  (b) => !!b.pdf_links
+) as Partial<Book & { author_name: string; category_name: string }>[];
 ---
 
 <Layout title={"كتب " + name}>
@@ -26,7 +29,12 @@ const books = getCategoryBooks(Number(id)).filter((b) => !!b.pdf_links);
     <ul role="list" class="link-card-grid">
       {
         books.map((b) => (
-          <Card href={`/book/${b.book_id}/`} title={b.book_name} />
+          <Card
+            href={`/book/${b.book_id}/`}
+            title={b.book_name}
+            author_name={b.author_name}
+            category_name={b.category_name}
+          />
         ))
       }
     </ul>
@@ -94,3 +102,4 @@ const books = getCategoryBooks(Number(id)).filter((b) => !!b.pdf_links);
     padding: 0;
   }
 </style>
+ ../../components/Card.tsx

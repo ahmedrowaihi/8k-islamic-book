@@ -1,5 +1,5 @@
 ---
-import Card from "../../components/Card.astro";
+import Card from "../../components/Card.tsx";
 import { getBooks, getBook } from "../../db";
 import Layout from "../../layouts/Layout.astro";
 export async function getStaticPaths() {
@@ -15,14 +15,19 @@ const links = JSON.parse(book.pdf_links).files;
 
 <Layout title={book.book_name}>
   <main>
-    <h1><span class="text-gradient">خزانة</span></h1>
+    <h1><span class="text-gradient"> <a href="/">خزانة</a></span></h1>
     <p class="instructions">
       خزانة هي مجموعة من الكتب التي يمكنك قراءتها مجانًا عبر الإنترنت. يمكنك
       أيضًا تحميل الكتب بتنسيق PDF.
     </p>
     {
       links.map((link: string, idx: number) => (
-        <Card href={link} title={idx + 1 + "-" + book.book_name} />
+        <Card
+          href={link}
+          title={idx + 1 + "-" + book.book_name}
+          author_name={book.author_name}
+          category_name={book.category_name}
+        />
       ))
     }
 
@@ -90,3 +95,4 @@ const links = JSON.parse(book.pdf_links).files;
     </style>
   </main>
 </Layout>
+ ../../components/Card.tsx
