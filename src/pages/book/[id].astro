@@ -1,24 +1,25 @@
 ---
 import Card from "../../components/Card.tsx";
 import { getBooks, getBook } from "../../db";
+import { safeLinksExtracts } from "../../utils/safe-links-extracts";
 import Layout from "../../layouts/Layout.astro";
 export async function getStaticPaths() {
-  return getBooks()
-    .filter((b) => !!b.pdf_links)
-    .filter((b) => JSON.parse(b.pdf_links)?.files?.length)
-    .map((b) => ({ params: { id: b.book_id } }));
+  return getBooks().map((b) => ({ params: { id: b.book_id } }));
 }
 const { id } = Astro.params;
 const book = getBook(Number(id));
-const links = JSON.parse(book.pdf_links).files;
+const links = safeLinksExtracts(book);
 ---
 
 <Layout title={book.book_name}>
   <main>
     <h1><span class="text-gradient"> <a href="/">خزانة</a></span></h1>
     <p class="instructions">
-      خزانة هي مجموعة من الكتب التي يمكنك قراءتها مجانًا عبر الإنترنت. يمكنك
-      أيضًا تحميل الكتب بتنسيق PDF.
+      <code>{book.category_name}</code>
+      <br />
+      <code>{book.book_name}</code>
+      <br />
+      <code>{book.author_name}</code>
     </p>
     {
       links.map((link: string, idx: number) => (
@@ -95,4 +96,3 @@ const links = JSON.parse(book.pdf_links).files;
     </style>
   </main>
 </Layout>
- ../../components/Card.tsx

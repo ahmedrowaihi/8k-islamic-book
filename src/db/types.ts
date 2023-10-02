@@ -80,3 +80,11 @@ export interface Version {
 export interface DbVar {
   value: number;
 }
+
+// -------------------
+// -- custom types ---
+// joined type
+export interface withBook extends Book {
+  author_name: string;
+  category_name: string;
+}

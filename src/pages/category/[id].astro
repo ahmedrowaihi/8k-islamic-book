@@ -1,8 +1,9 @@
 ---
 import Card from "../../components/Card.tsx";
 import { getCategories, getCategoryBooks } from "../../db";
-import type { Book } from "../../db/types";
+import type { Book, withBook } from "../../db/types";
 import Layout from "../../layouts/Layout.astro";
+import { safeLinksExtracts } from "../../utils/safe-links-extracts";
 export async function getStaticPaths() {
   const categories = getCategories()
     .filter((c) => !!c.category_name)
@@ -14,23 +15,35 @@ export async function getStaticPaths() {
 }
 const { id } = Astro.params;
 const { name } = Astro.props;
-const books = getCategoryBooks(Number(id)).filter(
-  (b) => !!b.pdf_links
-) as Partial<Book & { author_name: string; category_name: string }>[];
+
+const books = getCategoryBooks(Number(id));
+let safe_books = books.reduce((acc, book) => {
+  book.pdf_links = safeLinksExtracts(book) as any;
+  acc.push(book);
+  return acc;
+}, [] as Book[]) as withBook[];
+// sort by disabled
+// safe_books = safe_books.sort((a, b) => {
+//   if (a.pdf_links.length && !b.pdf_links.length) return -1;
+//   if (!a.pdf_links.length && b.pdf_links.length) return 1;
+//   return 0;
+// });
+safe_books = safe_books.filter((b) => b.pdf_links.length);
 ---
 
 <Layout title={"كتب " + name}>
   <main>
-    <h1><span class="text-gradient">خزانة</span></h1>
+    <h1><span class="text-gradient"> <a href="/">خزانة</a></span></h1>
     <p class="instructions">
-      خزانة هي مجموعة من الكتب التي يمكنك قراءتها مجانًا عبر الإنترنت. يمكنك
-      أيضًا تحميل الكتب بتنسيق PDF.
+      كتب <strong>{name}</strong> متوفرة بصيغة <code>PDF</code> للقراءة والتحميل
     </p>
     <ul role="list" class="link-card-grid">
       {
-        books.map((b) => (
+        safe_books.map((b) => (
           <Card
+            disabled={!b.pdf_links.length}
             href={`/book/${b.book_id}/`}
+            note={!b.pdf_links.length ? "قريبا بإذن الله" : ""}
             title={b.book_name}
             author_name={b.author_name}
             category_name={b.category_name}
